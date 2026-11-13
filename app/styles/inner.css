@@ -219,3 +219,12 @@
 .rented-none p{margin:8px 0 0}
 .rented-none a{color:var(--red);text-decoration:underline;text-underline-offset:4px}
 @media(max-width:700px){.rented-item{grid-template-columns:1fr}.rented-item img{width:72px;height:72px}}
+
+/* Card payment popup (Stripe embedded checkout) */
+.pay-dialog{width:min(520px,calc(100vw - 24px));max-height:calc(100vh - 24px);margin:auto;padding:0;border:0;border-radius:6px;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.pay-dialog::backdrop{background:rgba(0,0,0,.55)}
+.pay-dialog-bar{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #e3e3e3;font-size:16px}
+.pay-dialog-close{border:0;background:none;font-size:28px;line-height:1;cursor:pointer;color:#555;padding:0 4px}
+.pay-dialog-body{padding:8px;min-height:300px}
+.pay-dialog-done{padding:32px 24px;text-align:center}
+.pay-dialog-done h3{margin:0 0 10px}

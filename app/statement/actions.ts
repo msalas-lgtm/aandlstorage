@@ -7,7 +7,8 @@ import { getSettings } from "@/lib/content";
 import { stripe, stripeConfigured, returnBaseUrl } from "@/lib/stripe";
 import { requireTenant } from "@/lib/tenant/session";
 
-export type PayState = { status: "idle" | "info" | "error"; message: string };
+// "checkout" means the payment popup should open: it carries the Checkout session secret and the publishable key.
+export type PayState = { status: "idle" | "info" | "error" | "checkout"; message: string; clientSecret?: string; publishableKey?: string };
 
 const MIN_CENTS = 50; // Stripe's minimum charge
 
@@ -40,9 +41,14 @@ export async function proceedToPaymentAction(_prev: PayState, data: FormData): P
 
   const host = (await headers()).get("host");
   const base = returnBaseUrl(host ? `${host.startsWith("localhost") ? "http" : "https"}://${host}` : "");
+  // With STRIPE_PUBLISHABLE_KEY set, the card form opens in a popup on this page. Without it, Stripe's own page is used.
+  const publishableKey = process.env.STRIPE_PUBLISHABLE_KEY;
+  const popup = Boolean(publishableKey?.startsWith("pk_"));
   let url: string | null = null;
+  let clientSecret: string | null = null;
   try {
     const session = await stripe().checkout.sessions.create({
+      ...(popup ? { ui_mode: "embedded_page" as const, redirect_on_completion: "never" as const } : { success_url: `${base}/statement?paid=1`, cancel_url: `${base}/statement?canceled=1` }),
       mode: "payment",
       line_items: [
         {
@@ -57,13 +63,13 @@ export async function proceedToPaymentAction(_prev: PayState, data: FormData): P
       client_reference_id: String(tenant.id),
       metadata: { customer_id: String(tenant.id) },
       payment_intent_data: { metadata: { customer_id: String(tenant.id) } },
-      success_url: `${base}/statement?paid=1`,
-      cancel_url: `${base}/statement?canceled=1`,
     });
     url = session.url;
+    clientSecret = session.client_secret;
   } catch (error) {
     console.error("Stripe checkout failed:", error instanceof Error ? error.message : error);
   }
+  if (popup && clientSecret) return { status: "checkout", message: "", clientSecret, publishableKey };
   if (!url) {
     return { status: "error", message: `Sorry, we couldn't start the payment. Please try again or call the office at ${settings.phone}.` };
   }

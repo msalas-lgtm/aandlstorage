@@ -4,6 +4,7 @@ import { getSettings, getUnitTypes } from "@/lib/content";
 import { db } from "@/lib/db";
 import { sendEmail } from "@/lib/notify";
 import { tooManyRequests } from "@/lib/rate-limit";
+import { requireTenant } from "@/lib/tenant/session";
 
 export type RequestState = { status: "idle" | "success" | "error"; message: string };
 
@@ -52,6 +53,47 @@ export async function submitWaitingList(_prev: RequestState, data: FormData): Pr
     text: `Waiting list sign-up\n\nUnit size: ${unit.name} (${unit.price} / month)\nName: ${name}\nEmail: ${email}\nPhone: ${phone || "-"}\nDate: ${when || "-"}\n\n${notes || ""}`,
   });
 
+  if (saved.error && !emailed) {
+    return { status: "error", message: `Sorry, we couldn't send your request. Please call ${settings.phone}.` };
+  }
+  return {
+    status: "success",
+    message: "Thank you. You're on the waiting list, and we'll contact you as soon as this size is available.",
+  };
+}
+
+// A signed-in customer joins the waiting list. Their name and contact details come from their account.
+export async function submitWaitingListAsCustomer(_prev: RequestState, data: FormData): Promise<RequestState> {
+  const tenant = await requireTenant();
+  if (text(data, "website")) return { status: "success", message: "" };
+  if (await tooManyRequests("waiting-list-signed-in", 10)) {
+    return { status: "error", message: "Too many requests. Please try again later or call the office." };
+  }
+
+  const notes = text(data, "notes");
+  const when = text(data, "date");
+  if (when && !/^\d{4}-\d{2}-\d{2}$/.test(when)) return { status: "error", message: "Please choose a valid date" };
+  if (notes.length > 2000) return { status: "error", message: "Your note is too long" };
+
+  const unitTypeId = Number(text(data, "unitTypeId"));
+  const unit = (await getUnitTypes()).find((type) => type.id === unitTypeId && type.onWebsite);
+  const settings = await getSettings();
+  if (!unit) return { status: "error", message: "That unit size isn't available online. Please call the office." };
+
+  const saved = await db().from("waiting_list").insert({
+    unit_type_id: unit.id,
+    unit_type_name: unit.name,
+    name: tenant.fullName,
+    email: tenant.email,
+    phone: tenant.phone,
+    notes,
+    requested_move_in: when || null,
+  });
+  const emailed = await sendEmail({
+    subject: `Waiting list sign-up: ${unit.name} (${tenant.fullName})`,
+    replyTo: tenant.email || undefined,
+    text: `Waiting list sign-up from an existing customer\n\nUnit size: ${unit.name} (${unit.price} / month)\nName: ${tenant.fullName}\nEmail: ${tenant.email || "-"}\nPhone: ${tenant.phone || "-"}\nUsername: ${tenant.username}\nDate: ${when || "-"}\n\n${notes || ""}`,
+  });
   if (saved.error && !emailed) {
     return { status: "error", message: `Sorry, we couldn't send your request. Please call ${settings.phone}.` };
   }

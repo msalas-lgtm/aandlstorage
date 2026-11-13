@@ -1,5 +1,6 @@
 import { connection } from "next/server";
-import { applyLateFeesAction, runRentBillingAction } from "../../actions";
+import { applyLateFeesAction, runAutopayAction, runRentBillingAction } from "../../actions";
+import { db } from "@/lib/db";
 import { AdminForm } from "../../AdminForm";
 import { Card, DataTable, Notice, PageHeader } from "../../ui";
 import { formatCents } from "@/lib/content";
@@ -11,7 +12,23 @@ export default async function MonthlyBillingPage({ searchParams }: PageProps<"/a
   const today = new Date().toISOString().slice(0, 10);
   const month = typeof params.month === "string" && /^\d{4}-\d{2}$/.test(params.month) ? params.month : today.slice(0, 7);
   const { label } = monthBounds(month);
-  const [rentDue, lateDue] = await Promise.all([rentDueForMonth(month), lateFeesDue(today)]);
+  const [rentDue, lateDue, autopayRows] = await Promise.all([
+    rentDueForMonth(month),
+    lateFeesDue(today),
+    db()
+      .from("customers")
+      .select("full_name,autopay_brand,autopay_last4,credit_cents,ledger_entries(amount_cents,tax_cents,paid_cents)")
+      .eq("autopay_enabled", true)
+      .eq("archived", false)
+      .order("full_name")
+      .then((result) => (result.data ?? []) as unknown as { full_name: string; autopay_brand: string; autopay_last4: string; credit_cents: number; ledger_entries: { amount_cents: number; tax_cents: number; paid_cents: number }[] }[]),
+  ]);
+  const autopay = autopayRows.map((row) => ({
+    name: row.full_name,
+    card: `${row.autopay_brand || "card"} ${row.autopay_last4 ? `•••• ${row.autopay_last4}` : ""}`.trim(),
+    dueCents: Math.max(0, row.ledger_entries.reduce((sum, entry) => sum + entry.amount_cents + entry.tax_cents - entry.paid_cents, 0) - row.credit_cents),
+  }));
+  const autopayTotal = autopay.reduce((sum, item) => sum + item.dueCents, 0);
   const rentTotal = rentDue.reduce((sum, item) => sum + item.rentCents, 0);
   const lateTotal = lateDue.reduce((sum, item) => sum + item.feeCents, 0);
 
@@ -41,6 +58,27 @@ export default async function MonthlyBillingPage({ searchParams }: PageProps<"/a
           <div style={{ marginTop: 14 }}>
             <AdminForm action={runRentBillingAction} submitLabel={`Create ${rentDue.length} rent charges for ${label}`}>
               <input type="hidden" name="month" value={month} />
+            </AdminForm>
+          </div>
+        )}
+      </Card>
+
+      <Card title="Automatic payments (autopay)" subtitle="Customers who saved a card on their Recurring Billing page are charged what they owe.">
+        <DataTable
+          columns={["Customer", "Card", "Owes now"]}
+          empty="No customers have automatic payments on yet."
+          rows={autopay.slice(0, 40).map((item) => [item.name, item.card, formatCents(item.dueCents)])}
+          footer={`${autopay.length} customers with autopay on, ${autopay.filter((item) => item.dueCents > 0).length} owing ${formatCents(autopayTotal)}`}
+        />
+        <p className="adm-muted" style={{ marginTop: 10 }}>
+          This runs by itself every day once the daily job is set up (see the setup notes). Use the button to run it now. It
+          makes <strong>real card charges</strong> through Stripe, once per customer per day. A declined card is retried the
+          next day, and autopay switches off after 3 declines in a row.
+        </p>
+        {autopay.some((item) => item.dueCents > 0) && (
+          <div style={{ marginTop: 14 }}>
+            <AdminForm action={runAutopayAction} submitLabel={`Charge ${autopay.filter((item) => item.dueCents > 0).length} cards now (${formatCents(autopayTotal)})`}>
+              <input type="hidden" name="confirm" value="yes" />
             </AdminForm>
           </div>
         )}

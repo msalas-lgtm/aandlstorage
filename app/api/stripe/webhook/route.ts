@@ -1,4 +1,5 @@
 import type Stripe from "stripe";
+import { saveAutopayCard } from "@/lib/autopay";
 import { applyPayment, money } from "@/lib/billing";
 import { db } from "@/lib/db";
 import { sendEmail } from "@/lib/notify";
@@ -18,6 +19,31 @@ export async function POST(request: Request) {
     event = stripe().webhooks.constructEvent(await request.text(), signature, process.env.STRIPE_WEBHOOK_SECRET!);
   } catch {
     return new Response("Invalid signature", { status: 400 });
+  }
+
+  // A customer saved a card for autopay (the "Add Payment Account" popup).
+  if (event.type === "checkout.session.completed" && (event.data.object as Stripe.Checkout.Session).mode === "setup") {
+    const session = event.data.object as Stripe.Checkout.Session;
+    const customerId = Number(session.client_reference_id);
+    const stripeCustomerId = typeof session.customer === "string" ? session.customer : (session.customer?.id ?? "");
+    const setupIntentId = typeof session.setup_intent === "string" ? session.setup_intent : (session.setup_intent?.id ?? "");
+    if (!Number.isInteger(customerId) || customerId <= 0 || !stripeCustomerId || !setupIntentId) return new Response("ok");
+
+    // Only trust a card saved for the Stripe customer we created for this account.
+    const { data: owner } = await db().from("customers").select("stripe_customer_id").eq("id", customerId).maybeSingle();
+    if (!owner || owner.stripe_customer_id !== stripeCustomerId) {
+      console.error("Stripe webhook: card saved for a mismatched customer", session.id);
+      return new Response("ok");
+    }
+    try {
+      const intent = await stripe().setupIntents.retrieve(setupIntentId);
+      const method = typeof intent.payment_method === "string" ? intent.payment_method : intent.payment_method?.id;
+      if (intent.status === "succeeded" && method) await saveAutopayCard(customerId, stripeCustomerId, method);
+    } catch (error) {
+      console.error("Stripe webhook: couldn't save the card", session.id, error instanceof Error ? error.message : error);
+      return new Response("Could not save the card", { status: 500 });
+    }
+    return new Response("ok");
   }
 
   if (event.type === "checkout.session.completed" || event.type === "checkout.session.async_payment_succeeded") {

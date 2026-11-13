@@ -8,6 +8,8 @@ import { IMAGE_BUCKET, db } from "@/lib/db";
 import { entityFor, parseEntity } from "@/lib/admin/entities";
 import { addCharge, applyPayment, voidCharge } from "@/lib/billing";
 import { applyLateFees, runRentBilling } from "@/lib/billing-run";
+import { runAutopay } from "@/lib/autopay";
+import { stripeConfigured } from "@/lib/stripe";
 import { hashPassword, passwordProblem } from "@/lib/tenant/password";
 
 export type ActionState = { status: "idle" | "ok" | "error"; message: string };
@@ -791,6 +793,23 @@ export async function runRentBillingAction(_prev: ActionState, data: FormData): 
   return result.created === 0
     ? ok("Nothing to bill. Every active rental already has this month's rent charge.")
     : ok(`Created ${result.created} rent ${result.created === 1 ? "charge" : "charges"} totaling $${(result.totalCents / 100).toFixed(2)}. No emails or texts were sent.`);
+}
+
+// Charges the saved card of every customer with automatic payments on who owes money (real charges, through Stripe).
+export async function runAutopayAction(_prev: ActionState, data: FormData): Promise<ActionState> {
+  await requireAdmin();
+  if (text(data, "confirm") !== "yes") return fail("Please try again.");
+  if (!stripeConfigured()) return fail("Stripe isn't set up yet. Add the Stripe keys first.");
+  const result = await runAutopay();
+  revalidatePath("/admin/billing_run");
+  revalidatePath("/admin/customers");
+  const parts = [
+    `Charged ${result.charged} ${result.charged === 1 ? "customer" : "customers"} ($${(result.chargedCents / 100).toFixed(2)})`,
+    result.declined ? `${result.declined} declined (the office was emailed)` : "",
+    result.errors ? `${result.errors} need a look (check your email)` : "",
+    result.skippedToday ? `${result.skippedToday} already tried today` : "",
+  ].filter(Boolean);
+  return result.errors || result.declined ? fail(`${parts.join(". ")}.`) : ok(`${parts.join(". ")}.`);
 }
 
 export async function applyLateFeesAction(_prev: ActionState, data: FormData): Promise<ActionState> {

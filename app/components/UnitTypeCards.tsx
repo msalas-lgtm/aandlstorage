@@ -7,7 +7,10 @@ const formatPrice = (price: string) => price.replace(/\.00$/, "");
 
 // The unit-size cards shared by the public Rent page and the customer's "Rent Storage" page.
 // Availability is counted from the units table: no vacant units means the Waiting List button.
-export function UnitTypeCards({ units }: { units: UnitType[] }) {
+export function UnitTypeCards({ units, portal = false }: { units: UnitType[]; portal?: boolean }) {
+  // Inside the customer dashboard the buttons go to the signed-in versions of the forms (no username or password).
+  const rentPath = portal ? "/rentals/rent" : "/pages/rent/reserve";
+  const waitingPath = portal ? "/rentals/waiting_list" : "/waiting_list";
   return (
     <div className="unit-grid">
       {units.map((unit) => {
@@ -26,11 +29,11 @@ export function UnitTypeCards({ units }: { units: UnitType[] }) {
                 {unit.note && <em className="unit-note">{unit.note}</em>}
               </div>
               {waiting ? (
-                <Link className="button outline" href={`/waiting_list?unit_type_id=${unit.id}`}>
+                <Link className="button outline" href={`${waitingPath}?unit_type_id=${unit.id}`}>
                   Waiting List
                 </Link>
               ) : (
-                <Link className="button primary" href={`/pages/rent/reserve?unit_type_id=${unit.id}`}>
+                <Link className="button primary" href={`${rentPath}?unit_type_id=${unit.id}`}>
                   Rent Now
                 </Link>
               )}

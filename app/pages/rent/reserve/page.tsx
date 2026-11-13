@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { PageBanner } from "@/app/components/PageBanner";
 import { PageShell } from "@/app/components/PageShell";
 import { bookingWindow } from "@/lib/booking";
 import { getRules, getSettings, getUnitTypes, telHref } from "@/lib/content";
+import { getCurrentTenant } from "@/lib/tenant/session";
 import { RentForm } from "./RentForm";
 
 export const metadata: Metadata = {
@@ -17,6 +19,8 @@ async function ReserveBody({ searchParams }: { searchParams: PageProps<"/pages/r
   await connection();
   const raw = (await searchParams).unit_type_id;
   const id = Number(Array.isArray(raw) ? raw[0] : raw);
+  // Signed-in customers rent from their own dashboard, with no username or password to enter.
+  if (await getCurrentTenant()) redirect(`/rentals/rent${id ? `?unit_type_id=${id}` : ""}`);
   const [units, settings, rules] = await Promise.all([getUnitTypes(), getSettings(), getRules()]);
   const unit = units.find((type) => type.id === id && type.onWebsite);
 

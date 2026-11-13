@@ -68,5 +68,6 @@ export const config = {
     "/edit_profile/:path*",
     "/edit_profile",
     "/rentals",
+    "/rentals/:path*",
   ],
 };

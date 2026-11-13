@@ -1,8 +1,10 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { PageBanner } from "@/app/components/PageBanner";
 import { PageShell } from "@/app/components/PageShell";
 import { getUnitTypes } from "@/lib/content";
+import { getCurrentTenant } from "@/lib/tenant/session";
 import { RequestForm } from "./RequestForm";
 import type { RequestState } from "./actions";
 
@@ -18,6 +20,8 @@ type Props = {
 async function RequestBody({ searchParams, intro, dateLabel, submitLabel, action }: Omit<Props, "title">) {
   const raw = (await searchParams).unit_type_id;
   const id = Number(Array.isArray(raw) ? raw[0] : raw);
+  // Signed-in customers join from their own dashboard, with no contact details to retype.
+  if (await getCurrentTenant()) redirect(`/rentals/waiting_list${id ? `?unit_type_id=${id}` : ""}`);
   const unit = (await getUnitTypes()).find((type) => type.id === id && type.onWebsite);
 
   if (!unit) {

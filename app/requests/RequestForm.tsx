@@ -11,11 +11,14 @@ export function RequestForm({
   unitTypeId,
   dateLabel,
   submitLabel,
+  signedInAs,
 }: {
   action: (state: RequestState, data: FormData) => Promise<RequestState>;
   unitTypeId: number;
   dateLabel: string;
   submitLabel: string;
+  // Set for a signed-in customer: their details come from their account, so those fields are left out.
+  signedInAs?: string;
 }) {
   const [state, formAction, pending] = useActionState(action, INITIAL);
 
@@ -35,18 +38,26 @@ export function RequestForm({
         <label htmlFor="website">Website</label>
         <input id="website" name="website" type="text" tabIndex={-1} autoComplete="off" />
       </div>
-      <div className="field">
-        <label htmlFor="name">Name</label>
-        <input id="name" name="name" type="text" autoComplete="name" required />
-      </div>
-      <div className="field">
-        <label htmlFor="email">Email</label>
-        <input id="email" name="email" type="email" autoComplete="email" required />
-      </div>
-      <div className="field">
-        <label htmlFor="phone">Phone</label>
-        <input id="phone" name="phone" type="tel" autoComplete="tel" placeholder="Optional" />
-      </div>
+      {signedInAs ? (
+        <p className="account-note">
+          Joining as <strong>{signedInAs}</strong>. We&apos;ll use the contact details on your account.
+        </p>
+      ) : (
+        <>
+          <div className="field">
+            <label htmlFor="name">Name</label>
+            <input id="name" name="name" type="text" autoComplete="name" required />
+          </div>
+          <div className="field">
+            <label htmlFor="email">Email</label>
+            <input id="email" name="email" type="email" autoComplete="email" required />
+          </div>
+          <div className="field">
+            <label htmlFor="phone">Phone</label>
+            <input id="phone" name="phone" type="tel" autoComplete="tel" placeholder="Optional" />
+          </div>
+        </>
+      )}
       <div className="field">
         <label htmlFor="date">{dateLabel}</label>
         <input id="date" name="date" type="date" />

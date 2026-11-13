@@ -101,7 +101,7 @@ export default function RentalsPage() {
 
             <section>
               <h2 className="portal-subhead">{current.length > 0 ? "Rent another unit" : "Available units"}</h2>
-              <UnitTypeCards units={available} />
+              <UnitTypeCards units={available} portal />
             </section>
           </div>
         );
