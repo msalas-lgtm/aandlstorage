@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Build from this folder, not a parent folder that happens to have its own package-lock.json.
+  outputFileTracingRoot: process.cwd(),
   experimental: {
     agentFeedback: true,
   },
