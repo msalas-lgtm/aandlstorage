@@ -1,0 +1,65 @@
+{
+ "headerPhone": "(845) 485-5059",
+ "phone": "(845) 485-5059",
+ "email": "mchllstra@gmail.com",
+ "street": "220 Overocker Road",
+ "city": "Arlington",
+ "state": "NY",
+ "zip": "12603",
+ "facebook": "https://www.facebook.com/aandlstorage/",
+ "twitter": "",
+ "linkedin": "",
+ "instagram": "",
+ "youtube": "",
+ "yelp": "",
+ "reviewUrl": "",
+ "loginButtonText": "Make a Payment/Login",
+ "facilityName": "A&L Self Storage",
+ "websiteAddress": "https://www.aandlstorage.com",
+ "notificationsEmail": "mchllstra@gmail.com",
+ "replyToEmail": "mchllstra@gmail.com",
+ "hours": [
+  {
+   "day": "Sunday",
+   "status": "Open",
+   "open": "9:00 AM",
+   "close": "4:00 PM"
+  },
+  {
+   "day": "Monday",
+   "status": "Open",
+   "open": "9:00 AM",
+   "close": "4:00 PM"
+  },
+  {
+   "day": "Tuesday",
+   "status": "Open",
+   "open": "9:00 AM",
+   "close": "4:00 PM"
+  },
+  {
+   "day": "Wednesday",
+   "status": "Open",
+   "open": "9:00 AM",
+   "close": "4:00 PM"
+  },
+  {
+   "day": "Thursday",
+   "status": "Open",
+   "open": "9:00 AM",
+   "close": "4:00 PM"
+  },
+  {
+   "day": "Friday",
+   "status": "Open",
+   "open": "9:00 AM",
+   "close": "4:00 PM"
+  },
+  {
+   "day": "Saturday",
+   "status": "Closed",
+   "open": "9:00 AM",
+   "close": "12:00 PM"
+  }
+ ]
+}

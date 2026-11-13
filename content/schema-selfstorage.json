@@ -1,0 +1,36 @@
+{
+ "@context": "https://schema.org",
+ "@type": "SelfStorage",
+ "name": "A&L Self Storage",
+ "image": "https://storageunitsoftware-assets.s3.amazonaws.com/uploads/site/logo/4697/A_L-Logo.png",
+ "@id": "",
+ "url": "https://www.aandlstorage.com/",
+ "telephone": "(845) 485-5059",
+ "priceRange": "45-235",
+ "address": {
+  "@type": "PostalAddress",
+  "streetAddress": "220 Overocker (Rt44)",
+  "addressLocality": "Arlington",
+  "addressRegion": "NY",
+  "postalCode": "12603",
+  "addressCountry": "US"
+ },
+ "geo": {
+  "@type": "GeoCoordinates",
+  "latitude": 41.70134669999999,
+  "longitude": -73.87187519999998
+ },
+ "openingHoursSpecification": {
+  "@type": "OpeningHoursSpecification",
+  "dayOfWeek": [
+   "Monday",
+   "Wednesday",
+   "Tuesday",
+   "Thursday",
+   "Friday",
+   "Sunday"
+  ],
+  "opens": "09:00",
+  "closes": "16:00"
+ }
+}

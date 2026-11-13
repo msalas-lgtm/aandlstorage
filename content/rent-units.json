@@ -1,0 +1,76 @@
+[
+ {
+  "size": "5 x 3",
+  "img": "/uploads/unit_type/image/55418/small_nolabel-Unit-5x5.png",
+  "desc": "It fits a dresser, a small mattress set, and several small to medium-sized boxes. This space is also perfect for garden tools, seasonal decor, and sports equipment.",
+  "price": "$60",
+  "status": [
+   "Waiting List"
+  ]
+ },
+ {
+  "size": "5 x 5",
+  "img": "/uploads/unit_type/image/54753/small_storage-unit-5x5.png",
+  "desc": "It fits a dresser, a small mattress set, and several small to medium-sized boxes. This space is also perfect for garden tools, seasonal decor, and sports equipment.",
+  "price": "$75",
+  "status": [
+   "Waiting List"
+  ]
+ },
+ {
+  "size": "5 x 10",
+  "img": "/uploads/unit_type/image/55434/small_storage-unit-10x5.png",
+  "desc": "It fits furnishings of a mid-sized bedroom, including a queen-sized bed, a dresser, a TV and several small to medium-sized boxes.",
+  "price": "$115",
+  "status": [
+   "Rent Now"
+  ]
+ },
+ {
+  "size": "10 x 10",
+  "img": "/uploads/unit_type/image/55436/small_storage-unit-10x10.png",
+  "desc": "It fits the contents of two full bedrooms, including several small to medium-sized boxes, and items such as mattress sets, sofas, chests of drawers, bookcases, and desks.",
+  "price": "$150",
+  "status": [
+   "Rent Now"
+  ]
+ },
+ {
+  "size": "10 x 15",
+  "img": "/uploads/unit_type/image/55437/small_storage-unit-15x10.png",
+  "desc": "It fits the contents of an entire family room including several small to medium-sized boxes, and items such as mattress sets, sofas, chests of drawers, bookcases, and desks.",
+  "price": "$229",
+  "status": [
+   "Only 4 left!",
+   "Rent Now"
+  ]
+ },
+ {
+  "size": "O Matters Misc (20 x 9)",
+  "img": "/uploads/unit_type/image/55726/small_nolabel-Unit-10x20.png",
+  "desc": "It fits the contents of an entire family room and two full bedrooms, including several small to medium-sized boxes.",
+  "price": "$120",
+  "status": [
+   "Waiting List"
+  ]
+ },
+ {
+  "size": "10 x 20",
+  "img": "/uploads/unit_type/image/55438/small_Storage-Unit-20x10.png",
+  "desc": "It fits the contents of an entire family room and two full bedrooms, including several small to medium-sized boxes.",
+  "price": "$269",
+  "status": [
+   "Waiting List"
+  ]
+ },
+ {
+  "size": "10 x 25",
+  "img": "/uploads/unit_type/image/55439/small_Storage-Unit-25x10.png",
+  "desc": "It fits the contents of a fully furnished 3 bedroom house, including oversized items such as a couch, mattress sets, a dresser, a refrigerator, a washer/dryer, a dining room set, an entertainment center and several large boxes.",
+  "price": "$289",
+  "status": [
+   "Only 2 left!",
+   "Rent Now"
+  ]
+ }
+]
