@@ -1,5 +1,5 @@
 import { connection } from "next/server";
-import { createAdminUserAction, deleteAdminUserAction, setAdminUserDisabledAction } from "../../actions";
+import { changeOwnPasswordAction, createAdminUserAction, deleteAdminUserAction, setAdminUserDisabledAction } from "../../actions";
 import { AdminForm, ConfirmButton } from "../../AdminForm";
 import { Badge, Card, DataTable, Notice, PageHeader } from "../../ui";
 import { currentAdmin } from "@/lib/admin/auth";
@@ -25,6 +25,24 @@ export default async function UsersPage() {
         The <strong>owner</strong> login (email <code>owner</code> and the password in your .env.local) always works as a backup.
         Give each person their own account instead of sharing it.
       </Notice>
+      <Card title="Change your password" subtitle="Choose your own password. You'll need your current one.">
+        <AdminForm action={changeOwnPasswordAction} submitLabel="Change password" resetOnSuccess>
+          <div className="adm-fields">
+            <div className="adm-field">
+              <label htmlFor="p-current">Current password</label>
+              <input id="p-current" name="current" type="password" className="adm-input" required autoComplete="current-password" />
+            </div>
+            <div className="adm-field">
+              <label htmlFor="p-next">New password (8+ characters)</label>
+              <input id="p-next" name="next" type="password" className="adm-input" required minLength={8} autoComplete="new-password" />
+            </div>
+            <div className="adm-field">
+              <label htmlFor="p-confirm">Confirm new password</label>
+              <input id="p-confirm" name="confirm" type="password" className="adm-input" required minLength={8} autoComplete="new-password" />
+            </div>
+          </div>
+        </AdminForm>
+      </Card>
       <Card title="Add an admin" subtitle="A password is generated and shown once. Send it to them securely and ask them to keep it private.">
         <AdminForm action={createAdminUserAction} submitLabel="Create account and generate password" resetOnSuccess>
           <div className="adm-fields">

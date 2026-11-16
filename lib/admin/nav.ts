@@ -15,7 +15,6 @@ export const ADMIN_NAV: NavGroup[] = [
     items: [
       { label: "Dashboard", href: a("/reports/dashboard") },
       { label: "Task Manager", href: a("/tasks") },
-      { label: "Support", href: "https://support.storageunitsoftware.com", external: true },
       { label: "Make Customer Payment", href: a("/customers/make_payment") },
     ],
   },

@@ -10,7 +10,7 @@ import { addCharge, applyPayment, voidCharge } from "@/lib/billing";
 import { applyLateFees, runRentBilling } from "@/lib/billing-run";
 import { runAutopay } from "@/lib/autopay";
 import { stripeConfigured } from "@/lib/stripe";
-import { hashPassword, passwordProblem } from "@/lib/tenant/password";
+import { hashPassword, passwordProblem, verifyPassword } from "@/lib/tenant/password";
 
 export type ActionState = { status: "idle" | "ok" | "error"; message: string };
 const ok = (message: string): ActionState => ({ status: "ok", message });
@@ -574,6 +574,27 @@ export async function createAdminUserAction(_prev: ActionState, data: FormData):
   }
   revalidatePath("/admin/users");
   return ok(`Created ${email}. Password: ${password}   (copy it now, it won't be shown again)`);
+}
+
+// A signed-in admin chooses their own new password (must confirm the current one).
+export async function changeOwnPasswordAction(_prev: ActionState, data: FormData): Promise<ActionState> {
+  await requireAdmin();
+  const me = await currentAdmin();
+  if (!me || me.id === null) {
+    return fail("The owner login's password is set in .env.local (ADMIN_PASSWORD). Sign in with your own admin account to change it here.");
+  }
+  const current = String(data.get("current") ?? "");
+  const next = String(data.get("next") ?? "");
+  const confirm = String(data.get("confirm") ?? "");
+  const { data: row } = await db().from("admin_users").select("password_hash").eq("id", me.id).maybeSingle();
+  if (!row || !verifyPassword(current, row.password_hash)) return fail("Your current password isn't right.");
+  const problem = passwordProblem(next);
+  if (problem) return fail(problem);
+  if (next !== confirm) return fail("The new passwords don't match.");
+  if (next === current) return fail("Please choose a password different from your current one.");
+  const { error } = await db().from("admin_users").update({ password_hash: hashPassword(next) }).eq("id", me.id);
+  if (error) return fail("Couldn't change the password. Please try again.");
+  return ok("Your password has been changed.");
 }
 
 export async function resetAdminPasswordAction(_prev: ActionState, data: FormData): Promise<ActionState> {
