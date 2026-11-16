@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
 import { addChargeAction, addRentalAction, endRentalAction, recordPaymentAction, voidChargeAction } from "../../../../actions";
 import { AdminForm, ConfirmButton } from "../../../../AdminForm";
 import { Badge, Card, DataTable, LinkButton, Notice, PageHeader } from "../../../../ui";
@@ -12,6 +13,7 @@ export default async function EditCustomerPage({
   params,
   searchParams,
 }: PageProps<"/admin/customers/[id]/edit">) {
+  await connection(); // always built for each request: it shows live balances and today's date
   const { id } = await params;
   const { created } = await searchParams;
   const customerId = Number(id);

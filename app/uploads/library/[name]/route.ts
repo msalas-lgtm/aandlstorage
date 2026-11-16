@@ -1,7 +1,9 @@
+import fs from "node:fs";
 import path from "node:path";
-import { IMAGE_BUCKET } from "@/lib/db";
+import { IMAGE_BUCKET, usingSqlite } from "@/lib/db";
+import { uploadPath } from "@/lib/sqlite-db";
 
-// Serves images uploaded in the admin Image Library from Supabase Storage,
+// Serves images uploaded in the admin Image Library from Supabase Storage (or the uploads folder with SQLite),
 // so /uploads/library/<name> stays the same URL no matter where the file is kept.
 // It reads from storage directly (not the public CDN URL) so a deleted image disappears right away.
 const TYPES: Record<string, string> = {
@@ -16,6 +18,14 @@ export async function GET(_request: Request, { params }: RouteContext<"/uploads/
   const { name } = await params;
   const safe = path.basename(name);
   const type = TYPES[path.extname(safe).toLowerCase()];
+  if (usingSqlite()) {
+    // Uploaded images are files in the uploads folder (UPLOADS_DIR).
+    const file = uploadPath(IMAGE_BUCKET, safe);
+    if (!type || !fs.existsSync(file)) return new Response("Not found", { status: 404 });
+    return new Response(new Uint8Array(fs.readFileSync(file)), {
+      headers: { "Content-Type": type, "Cache-Control": "public, max-age=300, s-maxage=300" },
+    });
+  }
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_SECRET_KEY;
   if (!type || !url || !key) return new Response("Not found", { status: 404 });

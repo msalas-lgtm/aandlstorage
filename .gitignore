@@ -42,3 +42,6 @@ next-env.d.ts
 
 .vercel
 .env*
+
+# local SQLite database and uploaded images (contains customer data)
+/data

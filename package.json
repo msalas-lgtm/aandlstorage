@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:migrate-sqlite": "node scripts/migrate-supabase-to-sqlite.mjs",
+    "db:backup": "node scripts/backup-sqlite.mjs"
   },
   "dependencies": {
     "@stripe/stripe-js": "^10.3.0",

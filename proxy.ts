@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { sqliteBlogSlugExists } from "@/lib/sqlite-db";
 import { SESSION_COOKIE, TENANT_COOKIE, readToken, tenantSecret, verifyToken } from "@/lib/admin/token";
 
 // Asks Supabase whether the post exists (one tiny request, never cached) so deleted or unknown posts get a real 404.
 async function blogSlugExists(slug: string) {
+  if ((process.env.DATABASE_DRIVER ?? "").trim().toLowerCase() === "sqlite") return sqliteBlogSlugExists(slug);
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_SECRET_KEY;
   if (!url || !key) return true;
