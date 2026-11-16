@@ -581,7 +581,7 @@ export async function changeOwnPasswordAction(_prev: ActionState, data: FormData
   await requireAdmin();
   const me = await currentAdmin();
   if (!me || me.id === null) {
-    return fail("The owner login's password is set in .env.local (ADMIN_PASSWORD). Sign in with your own admin account to change it here.");
+    return fail("Please sign in with your own admin account to change your password.");
   }
   const current = String(data.get("current") ?? "");
   const next = String(data.get("next") ?? "");

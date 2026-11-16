@@ -3,6 +3,7 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
+import { clearLoginMisses, loginLocked, recordLoginMiss } from "@/lib/rate-limit";
 import { verifyPassword } from "@/lib/tenant/password";
 import { endTenantSession, startTenantSession } from "@/lib/tenant/session";
 
@@ -24,6 +25,9 @@ export async function loginTenantAction(_prev: LoginState, data: FormData): Prom
   if (entry && entry.until > Date.now() && entry.count >= MAX_MISSES) {
     return { status: "error", message: "Too many attempts. Please wait 15 minutes and try again, or call the office." };
   }
+  if ((await loginLocked(`tenant|${username}`, 10)) || (await loginLocked(`tenant-ip|${ip}`, 20))) {
+    return { status: "error", message: "Too many attempts. Please wait 15 minutes and try again, or call the office." };
+  }
 
   const { data: customer } = await db()
     .from("customers")
@@ -36,10 +40,13 @@ export async function loginTenantAction(_prev: LoginState, data: FormData): Prom
   if (!customer || !valid || customer.login_disabled || customer.archived) {
     const count = (entry && entry.until > Date.now() ? entry.count : 0) + 1;
     misses.set(key, { count, until: Date.now() + LOCK_MS });
+    await recordLoginMiss(`tenant|${username}`);
+    await recordLoginMiss(`tenant-ip|${ip}`);
     return { status: "error", message: "That username or password isn't right." };
   }
 
   misses.delete(key);
+  await clearLoginMisses(`tenant|${username}`);
   await startTenantSession(customer.id);
   redirect("/dashboard");
 }

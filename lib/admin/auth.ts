@@ -4,6 +4,7 @@ import { cookies, headers } from "next/headers";
 import { connection } from "next/server";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
+import { clearLoginMisses, loginLocked, recordLoginMiss } from "@/lib/rate-limit";
 import { verifyPassword } from "@/lib/tenant/password";
 import { SESSION_COOKIE, SESSION_SECONDS, createToken, readToken } from "./token";
 
@@ -37,11 +38,14 @@ export async function checkAdminLogin(loginId: string, password: string): Promis
   const ip = (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim() ?? "";
   const key = `${login}|${ip}`;
   const entry = misses.get(key);
-  if (entry && entry.until > Date.now() && entry.count >= MAX_MISSES) {
-    return { ok: false, message: "Too many attempts. Please wait 15 minutes and try again." };
-  }
+  const lockedMessage: LoginResult = { ok: false, message: "Too many attempts. Please wait 15 minutes and try again." };
+  if (entry && entry.until > Date.now() && entry.count >= MAX_MISSES) return lockedMessage;
+  // Saved lockouts: per email (stops one account being guessed from many places) and per visitor.
+  if ((await loginLocked(`admin|${login}`, 10)) || (await loginLocked(`admin-ip|${ip}`, 20))) return lockedMessage;
 
-  const wrong = (): LoginResult => {
+  const wrong = async (): Promise<LoginResult> => {
+    await recordLoginMiss(`admin|${login}`);
+    await recordLoginMiss(`admin-ip|${ip}`);
     const count = (entry && entry.until > Date.now() ? entry.count : 0) + 1;
     misses.set(key, { count, until: Date.now() + LOCK_MS });
     return { ok: false, message: "That email or password isn't right. Please try again." };
@@ -50,6 +54,7 @@ export async function checkAdminLogin(loginId: string, password: string): Promis
   if (login === OWNER_LOGIN) {
     if (!ownerPasswordMatches(password)) return wrong();
     misses.delete(key);
+    await clearLoginMisses(`admin|${login}`);
     return { ok: true, subject: "admin" };
   }
 
@@ -59,6 +64,7 @@ export async function checkAdminLogin(loginId: string, password: string): Promis
   if (!user || !valid || user.disabled) return wrong();
 
   misses.delete(key);
+  await clearLoginMisses(`admin|${login}`);
   await db().from("admin_users").update({ last_login_at: new Date().toISOString() }).eq("id", user.id);
   return { ok: true, subject: `admin:${user.id}` };
 }

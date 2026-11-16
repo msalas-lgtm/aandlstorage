@@ -1,7 +1,7 @@
 import { connection } from "next/server";
 import { changeOwnPasswordAction, createAdminUserAction, deleteAdminUserAction, setAdminUserDisabledAction } from "../../actions";
 import { AdminForm, ConfirmButton } from "../../AdminForm";
-import { Badge, Card, DataTable, Notice, PageHeader } from "../../ui";
+import { Badge, Card, DataTable, PageHeader } from "../../ui";
 import { currentAdmin } from "@/lib/admin/auth";
 import { db, unwrap } from "@/lib/db";
 import { ResetPassword } from "./UserControls";
@@ -21,10 +21,6 @@ export default async function UsersPage() {
   return (
     <>
       <PageHeader title="Users & Roles" description="People who can sign in to this admin dashboard. Everyone has full access." />
-      <Notice>
-        The <strong>owner</strong> login (email <code>owner</code> and the password in your .env.local) always works as a backup.
-        Give each person their own account instead of sharing it.
-      </Notice>
       <Card title="Change your password" subtitle="Choose your own password. You'll need your current one.">
         <AdminForm action={changeOwnPasswordAction} submitLabel="Change password" resetOnSuccess>
           <div className="adm-fields">
