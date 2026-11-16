@@ -1,13 +1,13 @@
 "use server";
 
 import { updateTag, revalidatePath } from "next/cache";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { addCharge } from "@/lib/billing";
 import { bookingWindow } from "@/lib/booking";
 import { CONTENT_TAG, getRules, getSettings, getUnitTypes } from "@/lib/content";
 import { db } from "@/lib/db";
 import { sendEmail } from "@/lib/notify";
+import { tooManyRequests } from "@/lib/rate-limit";
 import { hashPassword, passwordProblem } from "@/lib/tenant/password";
 import { startTenantSession } from "@/lib/tenant/session";
 
@@ -17,9 +17,6 @@ const text = (data: FormData, key: string) => {
   const value = data.get(key);
   return typeof value === "string" ? value.trim() : "";
 };
-
-// Best-effort brake on abuse: 5 rental attempts per hour per visitor on this server.
-const attempts = new Map<string, number[]>();
 
 const USERNAME = /^[a-z0-9][a-z0-9._-]{2,39}$/;
 
@@ -51,10 +48,7 @@ export async function rentUnitAction(_prev: RentState, data: FormData): Promise<
   const problem = passwordProblem(password);
   if (problem) return { status: "error", message: problem };
 
-  const ip = (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
-  const recent = (attempts.get(ip) ?? []).filter((time) => Date.now() - time < 3600000);
-  if (recent.length >= 5) return { status: "error", message: "Too many attempts. Please try again later or call the office." };
-  attempts.set(ip, [...recent, Date.now()]);
+  if (await tooManyRequests("rent", 5)) return { status: "error", message: "Too many attempts. Please try again later or call the office." };
 
   const unitTypeId = Number(text(data, "unitTypeId"));
   const type = (await getUnitTypes()).find((entry) => entry.id === unitTypeId && entry.onWebsite);

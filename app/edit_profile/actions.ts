@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
+import { clearLoginMisses, loginLocked, recordLoginMiss } from "@/lib/rate-limit";
 import { passwordProblem, hashPassword, verifyPassword } from "@/lib/tenant/password";
 import { requireTenant } from "@/lib/tenant/session";
 
@@ -41,10 +42,16 @@ export async function changePasswordAction(_prev: ProfileState, data: FormData):
   const next = String(data.get("next") ?? "");
   const confirm = String(data.get("confirm") ?? "");
 
+  const lockKey = `password|tenant|${tenant.id}`;
+  if (await loginLocked(lockKey, 5)) {
+    return { status: "error", message: "Too many attempts. Please wait 15 minutes and try again, or call the office." };
+  }
   const { data: customer } = await db().from("customers").select("password_hash").eq("id", tenant.id).maybeSingle();
   if (!verifyPassword(current, customer?.password_hash)) {
+    await recordLoginMiss(lockKey);
     return { status: "error", message: "Your current password isn't right." };
   }
+  await clearLoginMisses(lockKey);
   const problem = passwordProblem(next);
   if (problem) return { status: "error", message: problem };
   if (next !== confirm) return { status: "error", message: "The new passwords don't match." };

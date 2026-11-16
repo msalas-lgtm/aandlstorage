@@ -10,6 +10,7 @@ import { addCharge, applyPayment, voidCharge } from "@/lib/billing";
 import { applyLateFees, runRentBilling } from "@/lib/billing-run";
 import { runAutopay } from "@/lib/autopay";
 import { stripeConfigured } from "@/lib/stripe";
+import { clearLoginMisses, loginLocked, recordLoginMiss } from "@/lib/rate-limit";
 import { hashPassword, passwordProblem, verifyPassword } from "@/lib/tenant/password";
 
 export type ActionState = { status: "idle" | "ok" | "error"; message: string };
@@ -586,8 +587,14 @@ export async function changeOwnPasswordAction(_prev: ActionState, data: FormData
   const current = String(data.get("current") ?? "");
   const next = String(data.get("next") ?? "");
   const confirm = String(data.get("confirm") ?? "");
+  const lockKey = `password|admin|${me.id}`;
+  if (await loginLocked(lockKey, 5)) return fail("Too many attempts. Please wait 15 minutes and try again.");
   const { data: row } = await db().from("admin_users").select("password_hash").eq("id", me.id).maybeSingle();
-  if (!row || !verifyPassword(current, row.password_hash)) return fail("Your current password isn't right.");
+  if (!row || !verifyPassword(current, row.password_hash)) {
+    await recordLoginMiss(lockKey);
+    return fail("Your current password isn't right.");
+  }
+  await clearLoginMisses(lockKey);
   const problem = passwordProblem(next);
   if (problem) return fail(problem);
   if (next !== confirm) return fail("The new passwords don't match.");
