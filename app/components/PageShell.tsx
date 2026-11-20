@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import schema from "@/content/schema-selfstorage.json";
+import { businessSchema } from "@/lib/seo-extra";
 import { getNav, getSettings, telHref } from "@/lib/content";
 import { Icon } from "./Icon";
 import { MotionEffects } from "./MotionEffects";
@@ -31,7 +31,7 @@ export async function PageShell({ children }: { children: ReactNode }) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(schema).replace(/</g, "\\u003c"),
+          __html: JSON.stringify(businessSchema(settings)).replace(/</g, "\\u003c"),
         }}
       />
     </>

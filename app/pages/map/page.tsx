@@ -3,8 +3,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { Icon } from "@/app/components/Icon";
 import { PageBanner } from "@/app/components/PageBanner";
+import { JsonLd } from "@/app/components/JsonLd";
 import { PageShell } from "@/app/components/PageShell";
 import { getSettings, telHref } from "@/lib/content";
+import { breadcrumbSchema } from "@/lib/seo-extra";
 import { pageMetadata } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -103,6 +105,7 @@ export default async function MapPage() {
           />
         </div>
       </section>
+      <JsonLd data={breadcrumbSchema([{ name: "Home", path: "/" }, { name: "Map", path: "/pages/map" }])} />
     </PageShell>
   );
 }

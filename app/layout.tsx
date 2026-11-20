@@ -21,6 +21,7 @@ const manrope = Manrope({
 // Per-page titles, descriptions and canonicals come from lib/seo.ts (copied from the live site).
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.aandlstorage.com"),
+  openGraph: { siteName: "A&L Self Storage", locale: "en_US", type: "website" },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

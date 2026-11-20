@@ -4,8 +4,10 @@ import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { Icon } from "@/app/components/Icon";
 import { PageBanner } from "@/app/components/PageBanner";
+import { JsonLd } from "@/app/components/JsonLd";
 import { PageShell } from "@/app/components/PageShell";
 import { getNeighbors, getPost, getPosts, getRecentPosts } from "@/lib/blog";
+import { blogPostingSchema, breadcrumbSchema, socialMetadata } from "@/lib/seo-extra";
 
 // Slugs keep the live site's exact spelling and capitalization.
 export async function generateStaticParams() {
@@ -22,6 +24,14 @@ export async function generateMetadata({
     title: { absolute: post.metaTitle },
     description: post.metaDescription,
     alternates: { canonical: `https://www.aandlstorage.com/blog/${slug}` },
+    ...socialMetadata({
+      title: post.metaTitle,
+      description: post.metaDescription,
+      path: `/blog/${slug}`,
+      type: "article",
+      publishedTime: new Date(post.pubDate).toISOString(),
+      modifiedTime: post.updatedAt,
+    }),
   };
 }
 
@@ -98,6 +108,8 @@ async function BlogPost({ params }: { params: PageProps<"/blog/[slug]">["params"
           </aside>
         </div>
       </section>
+      <JsonLd data={blogPostingSchema(post)} />
+      <JsonLd data={breadcrumbSchema([{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { name: post.title, path: `/blog/${post.slug}` }])} />
     </PageShell>
   );
 }

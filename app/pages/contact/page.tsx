@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { PageBanner } from "@/app/components/PageBanner";
+import { JsonLd } from "@/app/components/JsonLd";
 import { PageShell } from "@/app/components/PageShell";
 import { getSettings } from "@/lib/content";
+import { breadcrumbSchema } from "@/lib/seo-extra";
 import { pageMetadata } from "@/lib/seo";
 import { ContactForm } from "./ContactForm";
 
@@ -48,6 +50,7 @@ export default async function ContactPage() {
           </div>
         </div>
       </section>
+      <JsonLd data={breadcrumbSchema([{ name: "Home", path: "/" }, { name: "Contact Us", path: "/pages/contact" }])} />
     </PageShell>
   );
 }

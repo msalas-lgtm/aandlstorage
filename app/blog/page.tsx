@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Icon } from "@/app/components/Icon";
 import { PageBanner } from "@/app/components/PageBanner";
+import { JsonLd } from "@/app/components/JsonLd";
 import { PageShell } from "@/app/components/PageShell";
 import { getPosts } from "@/lib/blog";
+import { breadcrumbSchema, socialMetadata } from "@/lib/seo-extra";
 import { SITE_URL } from "@/lib/site";
 
 const TITLE = "Self Storage Blog | A&L Self Storage";
@@ -13,6 +15,7 @@ const DESCRIPTION =
 export const metadata: Metadata = {
   title: { absolute: TITLE },
   description: DESCRIPTION,
+  ...socialMetadata({ title: TITLE, description: DESCRIPTION, path: "/blog" }),
   alternates: {
     canonical: `${SITE_URL}/blog`,
     // The RSS feed that used to live at /blog now lives at /blog.rss; feed readers find it from here.
@@ -85,6 +88,7 @@ export default async function BlogIndexPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, "\u003c") }}
       />
+      <JsonLd data={breadcrumbSchema([{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }])} />
     </PageShell>
   );
 }

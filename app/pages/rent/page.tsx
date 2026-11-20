@@ -2,10 +2,12 @@ import { cleanHtml } from "@/lib/sanitize";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { PageBanner } from "@/app/components/PageBanner";
+import { JsonLd } from "@/app/components/JsonLd";
 import { PageShell } from "@/app/components/PageShell";
 import { UnitTypeCards } from "@/app/components/UnitTypeCards";
 import defaults from "@/content/rent-page-content.json";
 import { getPages, getUnitTypes } from "@/lib/content";
+import { breadcrumbSchema, offerCatalogSchema } from "@/lib/seo-extra";
 import { pageMetadata } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -18,7 +20,12 @@ type RentContent = typeof defaults;
 // availability (counted from the units table), plus the text blocks (Website > Pages > Rent).
 async function LiveUnitCards() {
   const units = (await getUnitTypes()).filter((unit) => unit.onWebsite);
-  return <UnitTypeCards units={units} />;
+  return (
+    <>
+      <UnitTypeCards units={units} />
+      <JsonLd data={offerCatalogSchema(units)} />
+    </>
+  );
 }
 
 export default async function RentPage() {
@@ -68,6 +75,7 @@ export default async function RentPage() {
           </div>
         </div>
       </section>
+      <JsonLd data={breadcrumbSchema([{ name: "Home", path: "/" }, { name: "Rent Storage", path: "/pages/rent" }])} />
     </PageShell>
   );
 }

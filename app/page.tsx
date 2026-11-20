@@ -3,9 +3,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { ExternalArrow, Icon, type IconName } from "./components/Icon";
 import { HeroVideo } from "./components/HeroVideo";
+import { JsonLd } from "./components/JsonLd";
 import { PageShell } from "./components/PageShell";
 import { getSettings, telHref } from "@/lib/content";
 import { pageMetadata } from "@/lib/seo";
+import { websiteSchema } from "@/lib/seo-extra";
 import { DIRECTIONS_URL, REVIEW_URL, SITE_URL } from "@/lib/site";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -375,6 +377,7 @@ export default async function Home() {
           </p>
         </div>
       </section>
+      <JsonLd data={websiteSchema()} />
     </PageShell>
   );
 }

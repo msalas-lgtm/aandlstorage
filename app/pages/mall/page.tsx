@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { PageBanner } from "@/app/components/PageBanner";
+import { JsonLd } from "@/app/components/JsonLd";
 import { PageShell } from "@/app/components/PageShell";
+import { breadcrumbSchema } from "@/lib/seo-extra";
 import { pageMetadata } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -58,6 +60,7 @@ export default function MallPage() {
           </article>
         </div>
       </section>
+      <JsonLd data={breadcrumbSchema([{ name: "Home", path: "/" }, { name: "Mall At A&L Self Storage", path: "/pages/mall" }])} />
     </PageShell>
   );
 }

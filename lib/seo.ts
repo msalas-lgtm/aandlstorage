@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getPages, type PageSeo } from "@/lib/content";
+import { socialMetadata } from "@/lib/seo-extra";
 import { SITE_URL } from "@/lib/site";
 
 export async function seoFor(path: string): Promise<PageSeo> {
@@ -14,6 +15,7 @@ export async function pageMetadata(path: string): Promise<Metadata> {
   return {
     title: { absolute: title },
     description,
+    ...socialMetadata({ title, description, path }),
     // Next.js drops the trailing slash of the root canonical, so the home page
     // prints its own <link rel="canonical"> instead (see app/page.tsx).
     ...(path === "/" ? {} : { alternates: { canonical: `${SITE_URL}${path}` } }),
