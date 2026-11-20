@@ -34,7 +34,7 @@ export function RequestForm({
     <form className="contact-form" action={formAction} onSubmit={keepValues(formAction)}>
       <input type="hidden" name="unitTypeId" value={unitTypeId} />
       {/* Spam trap: real visitors never see or fill this field. */}
-      <div className="hp-field" aria-hidden="true">
+      <div className="hp-field" inert>
         <label htmlFor="website">Website</label>
         <input id="website" name="website" type="text" tabIndex={-1} autoComplete="off" />
       </div>

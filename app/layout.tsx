@@ -4,6 +4,7 @@ import "./styles/style.css";
 import "./styles/design.css";
 import "./styles/motion.css";
 import "./styles/inner.css";
+import "./styles/a11y.css";
 
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",

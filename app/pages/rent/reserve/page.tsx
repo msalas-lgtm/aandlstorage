@@ -27,7 +27,7 @@ async function ReserveBody({ searchParams }: { searchParams: PageProps<"/pages/r
   if (!unit) {
     return (
       <div className="panel">
-        <h4>Choose a unit size</h4>
+        <h3>Choose a unit size</h3>
         <p>Please pick a unit size on the Rent page first.</p>
         <p>
           <Link className="button primary" href="/pages/rent">
@@ -41,7 +41,7 @@ async function ReserveBody({ searchParams }: { searchParams: PageProps<"/pages/r
   if (!rules.onlineRentals) {
     return (
       <div className="panel">
-        <h4>Online rentals are paused</h4>
+        <h3>Online rentals are paused</h3>
         <p>
           Please call the office at <a href={telHref(settings.phone)}>{settings.phone}</a> to rent a unit.
         </p>
@@ -52,7 +52,7 @@ async function ReserveBody({ searchParams }: { searchParams: PageProps<"/pages/r
   if (unit.vacant === 0) {
     return (
       <div className="panel">
-        <h4>{unit.name} is full right now</h4>
+        <h3>{unit.name} is full right now</h3>
         <p>Join the waiting list and we&apos;ll contact you as soon as one opens up.</p>
         <p>
           <Link className="button primary" href={`/waiting_list?unit_type_id=${unit.id}`}>
@@ -68,7 +68,7 @@ async function ReserveBody({ searchParams }: { searchParams: PageProps<"/pages/r
   return (
     <div className="contact-grid">
       <div className="panel prose">
-        <h4>{unit.name}</h4>
+        <h3>{unit.name}</h3>
         <p>
           <strong>{unit.price.replace(/\.00$/, "")}</strong> / month
           {unit.note && <> · <strong>{unit.note}</strong></>}

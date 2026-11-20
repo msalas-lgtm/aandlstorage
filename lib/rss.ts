@@ -4,7 +4,8 @@ import { SITE_URL } from "@/lib/site";
 const escape = (value: string) =>
   value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-// Same feed the live site serves at /blog and /blog.rss.
+// RSS feed, served at /blog.rss. (/blog is now a normal page; feed readers that still ask it for XML are
+// sent here by proxy.ts.)
 export async function blogFeed() {
   const items = (await getPosts())
     .map((post) => {

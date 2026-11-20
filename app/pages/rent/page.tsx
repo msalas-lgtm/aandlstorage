@@ -31,7 +31,7 @@ export default async function RentPage() {
         <ol className="steps">
           {text.steps.map((step) => (
             <li key={step}>
-              <h4>{step}</h4>
+              <h3>{step}</h3>
             </li>
           ))}
         </ol>
@@ -60,7 +60,7 @@ export default async function RentPage() {
           <div className="why-grid">
             {text.why.map((block) => (
               <article key={block.title}>
-                <h4>{block.title}</h4>
+                <h3>{block.title}</h3>
                 <p dangerouslySetInnerHTML={{ __html: block.html }} />
               </article>
             ))}

@@ -18,7 +18,7 @@ export default async function ContactPage() {
       <section className="section inner">
         <div className="wrap contact-grid">
           <div className="panel prose">
-            <h4>We would love to hear from you!</h4>
+            <h3>We would love to hear from you!</h3>
             <h1>
               <strong>
                 Self Storage Facility Serving Arlington, NY and Surrounding

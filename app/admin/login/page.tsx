@@ -4,7 +4,7 @@ import { LoginForm } from "./LoginForm";
 
 export default function LoginPage() {
   return (
-    <div className="adm adm-login">
+    <main className="adm adm-login">
       <div className="adm-login-art">
         <h2>Run the website from one place.</h2>
         <p>Edit pages, blog posts, unit prices, hours and contact details for A&amp;L Self Storage.</p>
@@ -21,6 +21,6 @@ export default function LoginPage() {
           </Suspense>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

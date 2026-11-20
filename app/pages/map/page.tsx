@@ -23,7 +23,7 @@ export default async function MapPage() {
       <section className="section inner">
         <div className="wrap map-grid">
           <div className="panel">
-            <h4>Map to Our Self Storage Facility</h4>
+            <h3>Map to Our Self Storage Facility</h3>
             <iframe
               title="Map showing A and L Self Storage"
               src={MAP_EMBED_URL}
@@ -33,7 +33,7 @@ export default async function MapPage() {
             />
           </div>
           <div className="panel prose">
-            <h4>Conveniently Located Near You!</h4>
+            <h3>Conveniently Located Near You!</h3>
             <h1>Self Storage Facility in Arlington NY</h1>
             <p>
               A&amp;L Self Storage is conveniently located at 220 Overocker Rd,
@@ -62,7 +62,7 @@ export default async function MapPage() {
               <span className="trio-icon">
                 <Icon name="phone" />
               </span>
-              <h4>Call Us</h4>
+              <p className="trio-label">Call Us</p>
               <h3>
                 <a href={telHref(settings.phone)}>{settings.phone}</a>
               </h3>
@@ -71,7 +71,7 @@ export default async function MapPage() {
               <span className="trio-icon">
                 <Icon name="pin" />
               </span>
-              <h4>Visit Us</h4>
+              <p className="trio-label">Visit Us</p>
               <h3>
                 220 Overocker (Rt44)
                 <br />
@@ -82,7 +82,7 @@ export default async function MapPage() {
               <span className="trio-icon">
                 <Icon name="mail" />
               </span>
-              <h4>Email Us</h4>
+              <p className="trio-label">Email Us</p>
               <h3>
                 <a href={`mailto:${settings.email}`}>{settings.email}</a>
               </h3>

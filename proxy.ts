@@ -26,6 +26,16 @@ const TENANT_PAGES = ["/account", "/dashboard", "/statement", "/billing_accounts
 export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
 
+  // /blog is a normal page now. Feed readers that were subscribed to the old /blog feed ask for XML
+  // (and never for HTML), so they are still served the feed from /blog.rss.
+  if (pathname === "/blog") {
+    const accept = request.headers.get("accept") ?? "";
+    if (/(rss|atom)\+xml|application\/xml|text\/xml/i.test(accept) && !/text\/html/i.test(accept)) {
+      return NextResponse.rewrite(new URL("/blog.rss", request.url));
+    }
+    return NextResponse.next();
+  }
+
   // Unknown or deleted blog posts get a real 404 (not a streamed "soft 404").
   if (pathname.startsWith("/blog/")) {
     let slug = pathname.slice("/blog/".length);
@@ -61,6 +71,7 @@ export const config = {
   matcher: [
     "/admin",
     "/admin/:path*",
+    "/blog",
     "/blog/:slug+",
     "/account",
     "/dashboard",

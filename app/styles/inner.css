@@ -15,12 +15,12 @@
 /* Rent steps in the banner */
 .steps{list-style:none;margin:34px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:900px}
 .steps li{border:1px solid #ffffff2e;background:#ffffff12;backdrop-filter:blur(6px);border-radius:10px;padding:16px 20px}
-.steps h4{margin:0;font-family:var(--font-manrope),Manrope,sans-serif;font-size:15px;font-weight:700;letter-spacing:-.2px;color:#fff}
+.steps h3{margin:0;font-family:var(--font-manrope),Manrope,sans-serif;font-size:15px;font-weight:700;letter-spacing:-.2px;color:#fff}
 
 /* Shared section + panel */
 .section.inner{padding:70px 0}
 .panel{background:#fff;border:1px solid var(--line);border-radius:12px;padding:34px;min-width:0}
-.panel>h4,.unit-card>h4,.business>h4,.why-grid h4,.recent-posts>h4{font-family:var(--font-manrope),Manrope,sans-serif;font-size:20px;font-weight:750;letter-spacing:-.5px;color:var(--ink);margin:0 0 18px}
+.panel>h3,.unit-card>h3,.business>h3,.why-grid h3,.recent-posts>h3{font-family:var(--font-manrope),Manrope,sans-serif;font-size:20px;font-weight:750;letter-spacing:-.5px;color:var(--ink);margin:0 0 18px}
 .prose h1{font-size:clamp(24px,3vw,32px);font-weight:750;letter-spacing:-1px;line-height:1.2;margin:0 0 18px}
 .prose h2{font-size:clamp(24px,2.6vw,30px);margin:30px 0 14px}
 .prose h3{font-size:21px;margin:28px 0 12px}
@@ -40,7 +40,7 @@
 .trio-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:34px 24px;text-align:center;transition:transform .25s,box-shadow .25s}
 .trio-card:hover{transform:translateY(-5px);box-shadow:0 16px 30px #25365f14}
 .trio-icon{display:grid;place-items:center;width:58px;height:58px;border-radius:50%;background:#e8edf8;color:var(--red);margin:0 auto 18px}
-.trio-card h4{margin:0 0 8px;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.trio-label{margin:0 0 8px;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
 .trio-card h3{font-size:21px;line-height:1.4;word-break:break-word}
 .trio-card a:hover{color:var(--red)}
 .map-photo .wrap{display:flex;justify-content:center}
@@ -72,7 +72,7 @@
 .unit-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
 .unit-card{display:flex;flex-direction:column;justify-content:space-between;gap:22px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:28px;transition:transform .25s,box-shadow .25s}
 .unit-card:hover{transform:translateY(-6px);box-shadow:0 16px 30px #25365f14}
-.unit-card>h4{font-size:26px;color:var(--ink);margin:0}
+.unit-card>h3{font-size:26px;color:var(--ink);margin:0}
 .unit-body{display:flex;gap:22px;align-items:flex-start}
 .unit-body img{flex:none;width:120px;height:120px;border-radius:10px;background:#f0f3fa}
 .unit-body p{font-size:14px;line-height:1.85}
@@ -140,7 +140,7 @@
 .account-details div{display:grid;gap:2px}
 .account-details dt{font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);font-weight:700}
 .account-details dd{margin:0;font-size:14.5px;word-break:break-word}
-.panel>h4+.account-balance{margin-top:0}
+.panel>h3+.account-balance{margin-top:0}
 @media(max-width:1000px){.account-grid{grid-template-columns:1fr}}
 .account-banner{margin:0 0 24px;padding:16px 20px;border-radius:10px;background:#ecf9f1;border:1px solid #c7ecd7;line-height:1.7}
 .account-banner a{text-decoration:underline;text-underline-offset:4px}

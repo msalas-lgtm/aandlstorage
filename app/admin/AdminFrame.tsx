@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
+import Link, { useLinkStatus } from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState, type ReactNode } from "react";
 import { ADMIN_NAV, findNav, flatNav, type NavItem } from "@/lib/admin/nav";
@@ -15,6 +15,12 @@ function isActive(item: NavItem, pathname: string, search: string) {
     return pathname === itemPath && search === `?${itemQuery}`;
   }
   return pathname === item.href || pathname.startsWith(`${item.href}/`);
+}
+
+// Small spinner shown inside a sidebar link while its page is loading.
+function LinkPending() {
+  const { pending } = useLinkStatus();
+  return pending ? <span className="adm-link-pending" aria-hidden="true" /> : null;
 }
 
 export function AdminFrame({ children }: { children: ReactNode }) {
@@ -89,6 +95,7 @@ export function AdminFrame({ children }: { children: ReactNode }) {
                         onClick={() => setMenuOpen(false)}
                       >
                         {item.label}
+                        <LinkPending />
                       </Link>
                     ),
                   )}

@@ -7,6 +7,11 @@ import { SITE_URL } from "@/lib/site";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [pages, posts] = await Promise.all([getPages(), getPosts()]);
   return [
+    // The blog index page (the RSS feed lives at /blog.rss).
+    {
+      url: `${SITE_URL}/blog`,
+      lastModified: posts[0]?.updatedAt,
+    },
     ...pages.map((page) => ({
       url: `${SITE_URL}${page.path}`,
       lastModified: page.lastmod,

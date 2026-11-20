@@ -45,9 +45,10 @@ async function BlogPost({ params }: { params: PageProps<"/blog/[slug]">["params"
       <PageBanner title={post.title} eyebrow="A&L SELF STORAGE BLOG">
         <p className="post-meta">
           <em>{post.date}</em>
-          {/* /blog is the RSS feed route, not a page, so a plain link is correct. */}
-          {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-          <a href="/blog" className="rss-link">
+          <Link href="/blog" className="rss-link">
+            All posts
+          </Link>
+          <a href="/blog.rss" className="rss-link">
             RSS
           </a>
         </p>
@@ -78,7 +79,7 @@ async function BlogPost({ params }: { params: PageProps<"/blog/[slug]">["params"
             </nav>
           </div>
           <aside className="recent-posts">
-            <h4>Recent Posts</h4>
+            <h3>Recent Posts</h3>
             <div className="recent-list">
               {recent.map((item) => (
                 <Link

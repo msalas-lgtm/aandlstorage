@@ -14,7 +14,7 @@ export async function PageShell({ children }: { children: ReactNode }) {
       <a className="skip" href="#main">
         Skip to content
       </a>
-      <div className="topbar">
+      <aside className="topbar" aria-label="Contact information">
         <div className="wrap">
           <span>
             <Icon name="pin" />
@@ -23,7 +23,7 @@ export async function PageShell({ children }: { children: ReactNode }) {
           </span>
           <a href={telHref(settings.headerPhone)}>{settings.headerPhone}</a>
         </div>
-      </div>
+      </aside>
       <SiteHeader nav={nav} loginText={settings.loginButtonText} />
       <main id="main">{children}</main>
       <SiteFooter />

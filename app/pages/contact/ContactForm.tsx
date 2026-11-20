@@ -12,7 +12,7 @@ export function ContactForm() {
   return (
     <form className="contact-form" action={action} onSubmit={keepValues(action)}>
       {/* Spam trap: real visitors never see or fill this field. */}
-      <div className="hp-field" aria-hidden="true">
+      <div className="hp-field" inert>
         <label htmlFor="website">Website</label>
         <input id="website" name="website" type="text" tabIndex={-1} autoComplete="off" />
       </div>
@@ -43,7 +43,8 @@ export function ContactForm() {
         <input
           id="phone"
           name="phone"
-          type="text"
+          type="tel"
+          inputMode="tel"
           placeholder="Phone Number (optional)"
           autoComplete="tel"
         />

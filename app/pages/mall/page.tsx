@@ -23,7 +23,7 @@ export default function MallPage() {
       <section className="section inner">
         <div className="wrap business-grid">
           <article className="business">
-            <h4>Cuttin&apos; Corner Hair Studio</h4>
+            <h3>Cuttin&apos; Corner Hair Studio</h3>
             <p>
               Full service hair and beauty salon, featuring hair care &amp; hair
               cutting for the entire family. Have any questions? Give them a
@@ -35,7 +35,7 @@ export default function MallPage() {
             </p>
           </article>
           <article className="business">
-            <h4>Organic Matters</h4>
+            <h3>Organic Matters</h3>
             <p>
               Fine gardening firm that offers design, installation, and
               stewardship of sustainable landscapes in the Hudson Valley. Their
@@ -47,7 +47,7 @@ export default function MallPage() {
             </p>
           </article>
           <article className="business">
-            <h4>Empire Fuel</h4>
+            <h3>Empire Fuel</h3>
             <p>
               They offer high quality home heating fuel and guarantee the lowest
               and most competitive price. Senior citizen and quantity discounts

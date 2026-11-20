@@ -27,7 +27,7 @@ async function RequestBody({ searchParams, intro, dateLabel, submitLabel, action
   if (!unit) {
     return (
       <div className="panel">
-        <h4>Choose a unit size</h4>
+        <h3>Choose a unit size</h3>
         <p>Please pick a unit size on the Rent page first.</p>
         <p>
           <Link className="button primary" href="/pages/rent">
@@ -41,7 +41,7 @@ async function RequestBody({ searchParams, intro, dateLabel, submitLabel, action
   return (
     <div className="contact-grid">
       <div className="panel prose">
-        <h4>{unit.name}</h4>
+        <h3>{unit.name}</h3>
         <p>
           <strong>{unit.price.replace(/\.00$/, "")}</strong> / month
         </p>

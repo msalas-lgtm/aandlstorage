@@ -17,7 +17,7 @@ export function UnitTypeCards({ units, portal = false }: { units: UnitType[]; po
         const waiting = unit.availability === "waiting";
         return (
           <article className="unit-card" key={unit.id}>
-            <h4>{unit.name}</h4>
+            <h3>{unit.name}</h3>
             <div className="unit-body">
               {unit.image && <Image src={unit.image} alt="" width={150} height={150} sizes="150px" />}
               <p>{unit.description}</p>

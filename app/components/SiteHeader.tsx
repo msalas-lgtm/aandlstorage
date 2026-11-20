@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type SiteHeaderProps = {
   nav: { href: string; label: string }[];
@@ -14,6 +14,20 @@ export function SiteHeader({ nav: NAV, loginText }: SiteHeaderProps) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const menuButton = useRef<HTMLButtonElement>(null);
+
+  // Close the menu with Escape and give focus back to the button that opened it.
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setMenuOpen(false);
+        menuButton.current?.focus();
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [menuOpen]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 30);
@@ -51,21 +65,24 @@ export function SiteHeader({ nav: NAV, loginText }: SiteHeaderProps) {
           {loginText}
         </Link>
         <button
+          ref={menuButton}
           className="menu"
           type="button"
           aria-expanded={menuOpen}
-          aria-label="Toggle navigation"
+          aria-controls="mobile-nav"
+          aria-label={menuOpen ? "Close menu" : "Open menu"}
           onClick={() => setMenuOpen((open) => !open)}
         >
-          {menuOpen ? "×" : "☰"}
+          <span aria-hidden="true">{menuOpen ? "×" : "☰"}</span>
         </button>
       </div>
-      <div className={menuOpen ? "mobile-nav open" : "mobile-nav"}>
+      <nav id="mobile-nav" aria-label="Mobile navigation" className={menuOpen ? "mobile-nav open" : "mobile-nav"}>
         {NAV.map((item) => (
           <Link
             key={item.href}
             href={item.href}
             className={pathname === item.href ? "active" : undefined}
+            aria-current={pathname === item.href ? "page" : undefined}
             onClick={() => setMenuOpen(false)}
           >
             {item.label}
@@ -74,7 +91,7 @@ export function SiteHeader({ nav: NAV, loginText }: SiteHeaderProps) {
         <Link href="/login" onClick={() => setMenuOpen(false)}>
           {loginText}
         </Link>
-      </div>
+      </nav>
     </header>
   );
 }

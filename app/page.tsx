@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ExternalArrow, Icon, type IconName } from "./components/Icon";
+import { HeroVideo } from "./components/HeroVideo";
 import { PageShell } from "./components/PageShell";
 import { getSettings, telHref } from "@/lib/content";
 import { pageMetadata } from "@/lib/seo";
@@ -64,18 +65,7 @@ export default async function Home() {
     <PageShell>
       <link rel="canonical" href={`${SITE_URL}/`} />
       <section className="hero" id="home">
-        <video
-          className="hero-video"
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-          poster="/assets/facility.jpg"
-          aria-hidden="true"
-        >
-          <source src="/assets/hero.mp4" type="video/mp4" />
-        </video>
+        <HeroVideo />
         <div className="wrap hero-grid">
           <div className="hero-copy">
             <span className="eyebrow">
@@ -391,6 +381,11 @@ export default async function Home() {
               </Link>
             ))}
           </div>
+          <p className="blog-all">
+            <Link className="text-link" href="/blog">
+              View all blog posts
+            </Link>
+          </p>
         </div>
       </section>
     </PageShell>
