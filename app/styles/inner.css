@@ -69,6 +69,11 @@
 
 /* Rent */
 .rent-intro{max-width:860px;margin:0 auto 48px;text-align:center}
+/* Rent page: keep the intro heading and paragraph, and the "Why Rent" heading, centered on the page. */
+.rent-intro h1,.rent-intro p{max-width:none;margin-left:auto;margin-right:auto;text-align:center;text-wrap:balance}
+.why-rent .section-heading{justify-content:center;text-align:center}
+.why-rent .section-heading>div{text-align:center}
+.why-rent .section-heading h2{margin-left:auto;margin-right:auto;text-wrap:balance}
 .unit-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
 .unit-card{display:flex;flex-direction:column;justify-content:space-between;gap:22px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:28px;transition:transform .25s,box-shadow .25s}
 .unit-card:hover{transform:translateY(-6px);box-shadow:0 16px 30px #25365f14}
