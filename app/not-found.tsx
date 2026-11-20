@@ -1,12 +1,18 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Icon } from "./components/Icon";
 import { PageBanner } from "./components/PageBanner";
 import { PageShell } from "./components/PageShell";
 
+export const metadata: Metadata = {
+  title: "Page not found | A&L Self Storage",
+  robots: { index: false },
+};
+
 export default function NotFound() {
   return (
     <PageShell>
-      <PageBanner title="Page not found" eyebrow="ERROR 404">
+      <PageBanner as="h1" title="Page not found" eyebrow="ERROR 404">
         <p className="page-intro">
           We couldn&apos;t find the page you were looking for.
         </p>
