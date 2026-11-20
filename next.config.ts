@@ -5,6 +5,12 @@ const nextConfig: NextConfig = {
   outputFileTracingRoot: process.cwd(),
   experimental: {
     agentFeedback: true,
+    // The whole stylesheet is ~12 KB: inlining removes a render-blocking request.
+    inlineCss: true,
+  },
+  images: {
+    formats: ["image/avif", "image/webp"],
+    qualities: [50, 75],
   },
   async headers() {
     return [

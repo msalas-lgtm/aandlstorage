@@ -65,6 +65,16 @@ export default async function Home() {
     <PageShell>
       <link rel="canonical" href={`${SITE_URL}/`} />
       <section className="hero" id="home">
+        <Image
+          className="hero-bg"
+          src="/assets/facility.jpg"
+          alt=""
+          fill
+          sizes="100vw"
+          quality={50}
+          priority
+          fetchPriority="high"
+        />
         <HeroVideo />
         <div className="wrap hero-grid">
           <div className="hero-copy">
@@ -101,29 +111,6 @@ export default async function Home() {
               <Icon name="clock" />
               24-hour Access
             </div>
-          </div>
-          <div className="hero-visual">
-            <div className="photo-frame">
-              <Image
-                src="/assets/facility.jpg"
-                alt="A and L Self Storage facility with drive-up storage units and parking in Arlington, NY"
-                width={659}
-                height={435}
-                sizes="(max-width: 900px) 100vw, 560px"
-                priority
-              />
-            </div>
-            <div className="photo-tag">
-              <Icon name="pin" />
-              <div>
-                <strong>A&amp;L Self Storage</strong>
-                <span>220 Overocker Rd, Arlington, NY 12603</span>
-              </div>
-              <a href="#directions" aria-label="Directions to A and L Self Storage">
-                <ExternalArrow />
-              </a>
-            </div>
-            <div className="visual-dots" aria-hidden="true" />
           </div>
         </div>
       </section>
