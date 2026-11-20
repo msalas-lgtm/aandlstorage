@@ -38,11 +38,6 @@ footer :focus-visible,.topbar :focus-visible,.amenities :focus-visible,.page-ban
 /* Respect users who ask for less motion, including smooth scrolling. */
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}.hero video{display:none}}
 
-/* Pause control for the hero background video. */
-.hero-video-toggle{position:absolute;right:16px;bottom:16px;z-index:5;min-height:44px;padding:8px 14px;border:1px solid #fff;border-radius:8px;background:#172443;color:#fff;font-size:13px;font-weight:700;cursor:pointer}
-.hero-video-toggle:hover{background:#25365f}
-@media(prefers-reduced-motion:reduce){.hero-video-toggle{display:none}}
-
 /* More contrast: red links on pale backgrounds and grey step numbers. */
 .about-copy p a,.prose a:not(.button),.auth-links a{color:#c00000!important}
 .number{color:#586580!important}

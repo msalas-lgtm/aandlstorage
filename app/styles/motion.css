@@ -19,7 +19,7 @@ nav a:after{content:'';position:absolute;bottom:-13px;left:0;height:2px;width:10
 @media(max-width:520px){.price-grid{grid-template-columns:1fr;gap:24px}.price-card{display:flex;flex-direction:column;border-radius:16px}.unit-illustration{height:auto;aspect-ratio:1.5;padding:0;min-height:0}.price-content{padding:25px 25px 27px}.price-content h3{font-size:24px;margin-bottom:15px}.price{font-size:52px;margin-bottom:20px}.price-content .button{padding:16px 20px}.unit-illustration>span{top:16px;right:16px}.pricing-image-note{font-size:10px;margin-top:17px}.reveal-ready{transform:translateY(16px)}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation:none!important;transition:none!important}.reveal-ready{opacity:1;transform:none}.hero-visual:hover .photo-frame img,.about-photo:hover img,.price-card:hover .unit-illustration img{transform:none;scale:1}.price-card:hover,.promise-grid article:hover,.blog-card:hover,.amenity-grid>div:hover,.button:hover,.hero-visual:hover .photo-tag{transform:none}.scroll-progress{display:none}}
 
-.price-card,.price-content .button{border-radius:0}.about-photo{border-radius:0}.price-card:hover{box-shadow:0 20px 45px #25365f14}
+.price-card{border-radius:12px;overflow:hidden}.price-content .button{border-radius:0}.about-photo{border-radius:0}.price-card:hover{box-shadow:0 20px 45px #25365f14}
 
 @media(hover:hover) and (prefers-reduced-motion:no-preference){.price-card.reveal-ready.is-visible:hover,.price-card.reveal-ready.is-visible:focus-within{transform:translateY(-10px)}.blog-card.reveal-ready.is-visible:hover{transform:translateY(-7px)}}
 
