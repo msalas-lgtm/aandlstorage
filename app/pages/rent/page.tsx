@@ -1,3 +1,4 @@
+import { cleanHtml } from "@/lib/sanitize";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { PageBanner } from "@/app/components/PageBanner";
@@ -41,7 +42,7 @@ export default async function RentPage() {
         <div className="wrap">
           <div className="rent-intro prose">
             <h1>{text.heading}</h1>
-            <p dangerouslySetInnerHTML={{ __html: text.introHtml }} />
+            <p dangerouslySetInnerHTML={{ __html: cleanHtml(text.introHtml) }} />
           </div>
 
           <Suspense fallback={<div className="unit-grid" aria-busy="true" />}>
@@ -61,7 +62,7 @@ export default async function RentPage() {
             {text.why.map((block) => (
               <article key={block.title}>
                 <h3>{block.title}</h3>
-                <p dangerouslySetInnerHTML={{ __html: block.html }} />
+                <p dangerouslySetInnerHTML={{ __html: cleanHtml(block.html) }} />
               </article>
             ))}
           </div>

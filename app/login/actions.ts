@@ -47,7 +47,7 @@ export async function loginTenantAction(_prev: LoginState, data: FormData): Prom
 
   misses.delete(key);
   await clearLoginMisses(`tenant|${username}`);
-  await startTenantSession(customer.id);
+  await startTenantSession(customer.id, customer.password_hash);
   redirect("/dashboard");
 }
 

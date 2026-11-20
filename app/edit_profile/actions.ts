@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { clearLoginMisses, loginLocked, recordLoginMiss } from "@/lib/rate-limit";
 import { passwordProblem, hashPassword, verifyPassword } from "@/lib/tenant/password";
-import { requireTenant } from "@/lib/tenant/session";
+import { requireTenant, startTenantSession } from "@/lib/tenant/session";
 
 export type ProfileState = { status: "idle" | "ok" | "error"; message: string };
 
@@ -61,5 +61,7 @@ export async function changePasswordAction(_prev: ProfileState, data: FormData):
     .update({ password_hash: hashPassword(next), updated_at: new Date().toISOString() })
     .eq("id", tenant.id);
   if (error) return { status: "error", message: "Sorry, we couldn't change your password." };
+  // Every older session ended with the old password; keep this one signed in.
+  await startTenantSession(tenant.id);
   return { status: "ok", message: "Your password was changed." };
 }

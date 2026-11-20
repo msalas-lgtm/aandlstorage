@@ -1,3 +1,4 @@
+import { cleanHtml } from "@/lib/sanitize";
 import "server-only";
 import { cacheLife, cacheTag } from "next/cache";
 import { db, unwrap } from "@/lib/db";
@@ -128,7 +129,7 @@ export async function getPosts(): Promise<BlogPost[]> {
       updatedAt: new Date(row.updated_at).toISOString(),
       metaTitle: row.meta_title,
       metaDescription: row.meta_description,
-      html: row.html,
+      html: cleanHtml(row.html),
     };
   });
 }

@@ -1,5 +1,6 @@
 import "server-only";
 import Stripe from "stripe";
+import { SITE_URL } from "@/lib/site";
 
 // Card payments use Stripe Checkout: the customer types their card on Stripe's own page, so card numbers
 // never reach this server (and never touch our database or logs). We only store the amount and Stripe's ids.
@@ -17,6 +18,10 @@ export function stripe() {
 }
 
 // Where Stripe sends the customer back to. Set SITE_URL to the public address (for example https://www.aandlstorage.com).
+// The request's Host header is only trusted while developing; in production an unset SITE_URL falls back to the
+// real site address so a forged Host header can never decide where a customer is sent after paying.
 export function returnBaseUrl(fallback: string) {
-  return (process.env.SITE_URL || fallback).replace(/\/$/, "");
+  const configured = process.env.SITE_URL?.trim();
+  if (configured) return configured.replace(/\/$/, "");
+  return process.env.NODE_ENV === "production" ? SITE_URL : fallback.replace(/\/$/, "");
 }

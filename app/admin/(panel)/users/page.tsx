@@ -2,7 +2,7 @@ import { connection } from "next/server";
 import { changeOwnPasswordAction, createAdminUserAction, deleteAdminUserAction, setAdminUserDisabledAction } from "../../actions";
 import { AdminForm, ConfirmButton } from "../../AdminForm";
 import { Badge, Card, DataTable, PageHeader } from "../../ui";
-import { currentAdmin } from "@/lib/admin/auth";
+import { currentAdmin, isOwner } from "@/lib/admin/auth";
 import { db, unwrap } from "@/lib/db";
 import { ResetPassword } from "./UserControls";
 
@@ -13,14 +13,15 @@ const when = (value: string | null) =>
 
 export default async function UsersPage() {
   await connection();
-  const [me, users] = await Promise.all([
+  const [me, owner, users] = await Promise.all([
     currentAdmin(),
+    isOwner(),
     db().from("admin_users").select("*").order("created_at").then((result) => unwrap(result, "admin users") as AdminUser[]),
   ]);
 
   return (
     <>
-      <PageHeader title="Users & Roles" description="People who can sign in to this admin dashboard. Everyone has full access." />
+      <PageHeader title="Users & Roles" description={owner ? "People who can sign in to this admin dashboard. Only the owner login can add, reset, disable or delete people." : "People who can sign in to this admin dashboard. Only the owner login can manage other accounts."} />
       <Card title="Change your password" subtitle="Choose your own password. You'll need your current one.">
         <AdminForm action={changeOwnPasswordAction} submitLabel="Change password" resetOnSuccess>
           <div className="adm-fields">
@@ -39,6 +40,7 @@ export default async function UsersPage() {
           </div>
         </AdminForm>
       </Card>
+      {owner && (
       <Card title="Add an admin" subtitle="A password is generated and shown once. Send it to them securely and ask them to keep it private.">
         <AdminForm action={createAdminUserAction} submitLabel="Create account and generate password" resetOnSuccess>
           <div className="adm-fields">
@@ -53,8 +55,9 @@ export default async function UsersPage() {
           </div>
         </AdminForm>
       </Card>
+      )}
       <DataTable
-        columns={["Name", "Email", "Created", "Last sign-in", "Status", "Actions"]}
+        columns={owner ? ["Name", "Email", "Created", "Last sign-in", "Status", "Actions"] : ["Name", "Email", "Created", "Last sign-in", "Status"]}
         empty="No admin accounts yet. Add one above."
         rows={users.map((user) => [
           <strong key="n">{user.name || "—"}{me?.id === user.id && <> <Badge tone="blue">You</Badge></>}</strong>,
@@ -62,7 +65,7 @@ export default async function UsersPage() {
           when(user.created_at),
           when(user.last_login_at),
           user.disabled ? <Badge key="s" tone="gray">Disabled</Badge> : <Badge key="s" tone="green">Active</Badge>,
-          <span key="a" style={{ display: "inline-flex", gap: 6, flexWrap: "wrap", justifyContent: "flex-end", alignItems: "flex-start" }}>
+          ...(owner ? [<span key="a" style={{ display: "inline-flex", gap: 6, flexWrap: "wrap", justifyContent: "flex-end", alignItems: "flex-start" }}>
             <ResetPassword id={user.id} email={user.email} />
             <form action={setAdminUserDisabledAction} style={{ display: "inline" }}>
               <input type="hidden" name="id" value={user.id} />
@@ -72,7 +75,7 @@ export default async function UsersPage() {
             {me?.id !== user.id && (
               <ConfirmButton action={deleteAdminUserAction} fields={{ id: String(user.id) }} message={`Delete the account for ${user.email}?`} />
             )}
-          </span>,
+          </span>] : []),
         ])}
         footer={`${users.length} admin ${users.length === 1 ? "account" : "accounts"}`}
       />

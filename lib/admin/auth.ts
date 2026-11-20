@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { clearLoginMisses, loginLocked, recordLoginMiss } from "@/lib/rate-limit";
 import { verifyPassword } from "@/lib/tenant/password";
-import { SESSION_COOKIE, SESSION_SECONDS, createToken, readToken } from "./token";
+import { SESSION_COOKIE, SESSION_SECONDS, createToken, readSession, sessionVersion } from "./token";
 
 const secret = () => process.env.ADMIN_SECRET;
 
@@ -29,7 +29,7 @@ const misses = new Map<string, { count: number; until: number }>();
 const MAX_MISSES = 5;
 const LOCK_MS = 15 * 60 * 1000;
 
-export type LoginResult = { ok: true; subject: string } | { ok: false; message: string };
+export type LoginResult = { ok: true; subject: string; version: string } | { ok: false; message: string };
 
 export async function checkAdminLogin(loginId: string, password: string): Promise<LoginResult> {
   const login = loginId.trim().toLowerCase();
@@ -55,7 +55,7 @@ export async function checkAdminLogin(loginId: string, password: string): Promis
     if (!ownerPasswordMatches(password)) return wrong();
     misses.delete(key);
     await clearLoginMisses(`admin|${login}`);
-    return { ok: true, subject: "admin" };
+    return { ok: true, subject: "admin", version: sessionVersion(secret(), `owner|${process.env.ADMIN_PASSWORD}`) };
   }
 
   const { data: user } = await db().from("admin_users").select("id,password_hash,disabled").eq("email", login).maybeSingle();
@@ -66,11 +66,11 @@ export async function checkAdminLogin(loginId: string, password: string): Promis
   misses.delete(key);
   await clearLoginMisses(`admin|${login}`);
   await db().from("admin_users").update({ last_login_at: new Date().toISOString() }).eq("id", user.id);
-  return { ok: true, subject: `admin:${user.id}` };
+  return { ok: true, subject: `admin:${user.id}`, version: sessionVersion(secret(), user.password_hash) };
 }
 
-export async function startSession(subject = "admin") {
-  (await cookies()).set(SESSION_COOKIE, createToken(secret()!, subject), {
+export async function startSession(subject = "admin", version = "") {
+  (await cookies()).set(SESSION_COOKIE, createToken(secret()!, subject, Date.now(), version), {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
@@ -87,14 +87,28 @@ export async function endSession() {
 // lose access on their next request even if their session cookie hasn't expired.
 export async function currentAdmin(): Promise<{ id: number | null; email: string; name: string } | null> {
   await connection();
-  const sub = readToken((await cookies()).get(SESSION_COOKIE)?.value, secret());
-  if (sub === "admin") return { id: null, email: OWNER_LOGIN, name: "Owner" };
+  const session = readSession((await cookies()).get(SESSION_COOKIE)?.value, secret());
+  const sub = session?.sub;
+  // The version must match the current password, so a password change signs out every older session.
+  if (sub === "admin") {
+    return session!.v === sessionVersion(secret(), `owner|${process.env.ADMIN_PASSWORD}`) ? { id: null, email: OWNER_LOGIN, name: "Owner" } : null;
+  }
   if (!sub?.startsWith("admin:")) return null;
   const id = Number(sub.slice(6));
   if (!Number.isInteger(id)) return null;
-  const { data: user } = await db().from("admin_users").select("id,email,name,disabled").eq("id", id).maybeSingle();
-  if (!user || user.disabled) return null;
+  const { data: user } = await db().from("admin_users").select("id,email,name,disabled,password_hash").eq("id", id).maybeSingle();
+  if (!user || user.disabled || session!.v !== sessionVersion(secret(), user.password_hash)) return null;
   return { id: user.id, email: user.email, name: user.name };
+}
+
+// Only the owner login (ADMIN_PASSWORD) manages other admins; staff accounts can't add, reset, disable or delete people.
+export async function isOwner() {
+  return (await currentAdmin())?.id === null;
+}
+
+export async function requireOwner() {
+  await requireAdmin();
+  if (!(await isOwner())) redirect("/admin/reports/dashboard");
 }
 
 export async function isAdmin() {

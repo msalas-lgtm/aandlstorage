@@ -100,7 +100,7 @@ export function PostBodyEditor({ initial }: { initial: string }) {
       </div>
       <div className="adm-field">
         <span className="adm-label">Preview</span>
-        <div className="adm-preview" dangerouslySetInnerHTML={{ __html: html }} />
+        <iframe className="adm-preview" title="Preview" sandbox="" srcDoc={`<base target="_blank"><style>body{font:15px/1.6 system-ui,sans-serif;margin:12px}img{max-width:100%;height:auto}</style>${html}`} style={{ width: "100%", minHeight: 320, border: 0 }} />
       </div>
     </div>
   );

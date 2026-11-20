@@ -2,7 +2,9 @@
 
 import { revalidatePath, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
-import { adminConfigured, checkAdminLogin, currentAdmin, endSession, generatePassword, requireAdmin, startSession } from "@/lib/admin/auth";
+import { adminConfigured, checkAdminLogin, currentAdmin, endSession, generatePassword, requireAdmin, requireOwner, startSession } from "@/lib/admin/auth";
+import { sniffImageExtension } from "@/lib/admin/image-sniff";
+import { sessionVersion } from "@/lib/admin/token";
 import { CONTENT_TAG, type HoursRow, type SiteSettings } from "@/lib/content";
 import { IMAGE_BUCKET, db } from "@/lib/db";
 import { entityFor, parseEntity } from "@/lib/admin/entities";
@@ -41,7 +43,7 @@ export async function loginAction(_prev: ActionState, data: FormData): Promise<A
     await new Promise((resolve) => setTimeout(resolve, 600));
     return fail(result.message);
   }
-  await startSession(result.subject);
+  await startSession(result.subject, result.version);
   const next = text(data, "next");
   redirect(next.startsWith("/admin") && !next.startsWith("//") ? next : "/admin/reports/dashboard");
 }
@@ -283,11 +285,14 @@ export async function uploadImageAction(_prev: ActionState, data: FormData): Pro
   const extension = IMAGE_TYPES[file.type];
   if (!extension) return fail("Images must be PNG, JPG, WebP or GIF.");
   if (file.size > 5 * 1024 * 1024) return fail("Images must be 5 MB or smaller.");
+  const bytes = Buffer.from(await file.arrayBuffer());
+  // The browser's file type can be faked, so the file's own first bytes must agree with it.
+  if (sniffImageExtension(bytes) !== extension) return fail("That file isn't a real PNG, JPG, WebP or GIF image.");
 
   const base = (file.name.replace(/\.[^.]+$/, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "image").slice(0, 50);
   const name = `${base}-${Math.random().toString(36).slice(2, 7)}${extension}`;
   const client = db();
-  const { error } = await client.storage.from(IMAGE_BUCKET).upload(name, Buffer.from(await file.arrayBuffer()), {
+  const { error } = await client.storage.from(IMAGE_BUCKET).upload(name, bytes, {
     contentType: file.type,
     upsert: false,
   });
@@ -563,7 +568,7 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // Creates an admin login with a generated password. The password is shown once and never stored in plain text.
 export async function createAdminUserAction(_prev: ActionState, data: FormData): Promise<ActionState> {
-  await requireAdmin();
+  await requireOwner();
   const email = text(data, "email").toLowerCase();
   const name = text(data, "name");
   if (!EMAIL.test(email)) return fail("Please include a valid email address.");
@@ -599,13 +604,16 @@ export async function changeOwnPasswordAction(_prev: ActionState, data: FormData
   if (problem) return fail(problem);
   if (next !== confirm) return fail("The new passwords don't match.");
   if (next === current) return fail("Please choose a password different from your current one.");
-  const { error } = await db().from("admin_users").update({ password_hash: hashPassword(next) }).eq("id", me.id);
+  const newHash = hashPassword(next);
+  const { error } = await db().from("admin_users").update({ password_hash: newHash }).eq("id", me.id);
   if (error) return fail("Couldn't change the password. Please try again.");
+  // Every older session ended with the old password; keep this one signed in.
+  await startSession(`admin:${me.id}`, sessionVersion(process.env.ADMIN_SECRET, newHash));
   return ok("Your password has been changed.");
 }
 
 export async function resetAdminPasswordAction(_prev: ActionState, data: FormData): Promise<ActionState> {
-  await requireAdmin();
+  await requireOwner();
   const id = Number(text(data, "id"));
   const password = generatePassword();
   const { data: rows, error } = await db()
@@ -618,13 +626,13 @@ export async function resetAdminPasswordAction(_prev: ActionState, data: FormDat
 }
 
 export async function setAdminUserDisabledAction(data: FormData) {
-  await requireAdmin();
+  await requireOwner();
   await db().from("admin_users").update({ disabled: text(data, "disabled") === "yes" }).eq("id", Number(text(data, "id")));
   revalidatePath("/admin/users");
 }
 
 export async function deleteAdminUserAction(data: FormData) {
-  await requireAdmin();
+  await requireOwner();
   const me = await currentAdmin();
   const id = Number(text(data, "id"));
   if (me?.id === id) return; // you can't delete the account you're using
